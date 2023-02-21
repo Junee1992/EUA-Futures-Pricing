@@ -1,0 +1,1 @@
+The code that can be used for simulation study from Han (2022), Journal of Dependence Modeling
