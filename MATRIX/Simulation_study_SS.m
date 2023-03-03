@@ -78,19 +78,19 @@ par_names_model1 = define_parameters(LT, ncontracts, correlation, 0)';
 n_par = length(par_names_model1);
 [par_model2, log_L_model1, par_init, trend, season, att, ytt, ett] = param_estim(y, ttm, deltat, detrend_price, n_par, ncontracts, par_names_model1, LT, correlation, max_lags);
 par_model1 = par_model2(1:8+ncontracts);
-AIC_model1 = 2*log_L_model1+ par_optim(length(par_names_model1));
+AIC_model1 = 2*log_L_model1+ 2*(length(par_names_model1));
 
 serial = "yes";
 par_names_model2 = define_parameters(LT, ncontracts, correlation, 1)';
-log_L_model2 = kf_v2_arp(par_model1, par_names_model2, y, deltat, ttm, LT, correlation, serial);
-AIC_model2 = 2*log_L_model2 + par_optim(length(par_names_model2));
+log_L_model2 = kf_v2_arp(par_model2, par_names_model2, y, deltat, ttm, LT, correlation, serial);
+AIC_model2 = 2*log_L_model2 + 2*(length(par_names_model2));
 
 n_lag = max_lags;
 par_names_model3 = define_parameters(LT, ncontracts, correlation, n_lag)';
 n_par = length(par_names_model3);
 par_init = par_model2;
 [par_model3, log_L_model3, par_init, trend, season, att, ytt, ett] = param_estim_arp(y, ttm, deltat, detrend_price, n_par, par_names_model3, LT, correlation, par_init);
-AIC_model3 = 2*log_L_model3 + par_optim(length(par_names_model3));
+AIC_model3 = 2*log_L_model3 + 2*(length(par_names_model3));
 
 model1_result = set_parameters(LT, ncontracts, par_names_model1, par_model1, correlation, "no");
 model2_result = set_parameters(LT, ncontracts, par_names_model2, par_model2, correlation, "yes");
@@ -180,7 +180,7 @@ n_par = size(par_names_model2, 1);
 
 n_lag = max_lags;
 par_names_model3 = define_parameters(LT, ncontracts, correlation, n_lag)';
-n_par = length(par_names_model2);
+n_par = length(par_names_model3);
 par_init = par_optim_model2;
 [par_optim_model3, log_L_optim_model3, par_init, trend, season, att, ytt, ett] = param_estim_arp(y, ttm, deltat, detrend_price, n_par, par_names_model3, LT, correlation, par_init);
 

@@ -44,7 +44,7 @@ global save_ett save_ytt save_att save_vt
 options = optimset('Display', 'iter', 'TolFun', 1e-6, 'TolX', 1e-6, 'MaxIter', 300, 'MaxFunEvals', 50000);
 % kf_v1_arp(par_init, par_names, y, deltat, ttm, LT, correlation, serial)
 if LT == "GBM"
-    [par_optimised, log_L, exitflag, output, lambda, grad, hessian] = fmincon(@kf_v1_arp, par_init, [], [], [], [], lb, ub, [], options, par_names, y_deseason, deltat, ttm, LT, correlation, serial);
+    [par_optimised, log_L, exitflag, output, lambda, grad, hessian] = fmincon(@kf_v2_arp, par_init, [], [], [], [], lb, ub, [], options, par_names, y_deseason, deltat, ttm, LT, correlation, serial);
 elseif LT == "OU"
     [par_optimised, log_L, exitflag, output, lambda, grad, hessian] = fmincon(@kf_v2_arp, par_init, A, b, [], [], lb, ub, [], options, par_names, y_deseason, deltat, ttm, LT, correlation, serial);
 end
