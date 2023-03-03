@@ -169,10 +169,25 @@ for i = 1+n_lag:nobsn
 %     end
 if n_lag == 1
     vt = zeros(ncontracts, nobsn);
-elseif n_lag == 2
-    J = Ptt(:,:,i-2)*G'*inv(Ptt_1(:,:,i-2));
-    wt_1 = att(:,i-1) - C - G*(att(:,i-2) + J * (att(:,i-1) - att_1(:,i-2)));
-    vt(:,i) = diag(par.phi(ncontracts+1:2*ncontracts)) * B_temp(:,:,i-2) * inv(G) * wt_1;
+
+elseif n_lag > 1
+    Gw = zeros(length(C),1);
+    phiBGw = zeros(ncontracts, 1);
+    for r = 2:n_lag
+        for k = 2:r
+            wt = ks_v1(i, k, LT, par, deltat, ttm, att, att_1, Ptt, Ptt_1);
+            Gw = Gw + inv(G)^(r-k+1) * wt(:,k); %% Need to fix this section.
+        end
+        phiBGw = phiBGw + diag(par.phi((r-1)*ncontracts+1:r*ncontracts)) * B_temp(:,:,i-2) * Gw;
+    end
+    vt(:,i) = phiBGw;
+
+
+% elseif n_lag == 2
+%     smthx = ks_v1(i-1, LT, par, deltat, ttm, att, att_1, Ptt, Ptt_1)
+%     J = Ptt(:,:,i-2)*G'*inv(Ptt_1(:,:,i-2));
+%     wt_1 = att(:,i-1) - C - G*(att(:,i-2) + J * (att(:,i-1) - att_1(:,i-2)));
+%     vt(:,i) = diag(par.phi(ncontracts+1:2*ncontracts)) * B_temp(:,:,i-2) * inv(G) * wt_1;
 end
     %Prediction error and covariance matrix
     % e_t = y_t - E[y_t | I_{t-1}]
