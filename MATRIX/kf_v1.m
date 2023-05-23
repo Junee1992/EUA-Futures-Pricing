@@ -86,14 +86,14 @@ end
 % E(x_{1|0}) = a0
 % Cov(x_{1|0}) = P0
 if LT == "GBM"
-    a0 = [0; 0];
-    P0 = [100, 0; 0, 100];
-%     P0 = [0.01, 0.01; 0.01, 0.01];
+    a0 = [0; y(1,1)];
+%     P0 = [100, 0; 0, 100];
+    P0 = [0.01, 0.01; 0.01, 0.01];
 
 elseif LT == "OU"
-    a0 = [0; 0];
-    P0 = [100, 0; 0, 100];
-
+    a0 = [0; y(1,1)];
+%     P0 = [100, 0; 0, 100];
+    P0 = [0.01, 0.01; 0.01, 0.01];
 %     a0 = [0 ; par.mu / par.gamma]; % a_1|0
 %     P0 = [par.sigmachi^2 / (2*par.kappa), par.sigmachi * par.sigmaxi * par.rho_chixi / (par.kappa + par.gamma);
 %         par.sigmachi * par.sigmaxi * par.rho_chixi / (par.kappa + par.gamma), par.sigmaxi^2 / (2 * par.gamma)]; % P_1_0

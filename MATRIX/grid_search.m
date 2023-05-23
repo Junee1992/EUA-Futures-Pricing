@@ -1,4 +1,4 @@
-function init = grid_search(lb, ub, ngrid, npar_grid, n_par, n_lag, ncontracts, LT, correlation)
+function init = grid_search(lb, ub, n_lag, ncontracts, LT, correlation)
 
 % Grid search
 mid = (lb + ub) / 2;
@@ -16,10 +16,22 @@ if LT == "GBM"
                 for sx = grid(5,:)
                     for rh = grid(6,:)
                         if correlation == 0
-                            init = [init; k, sc, 0, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.3, n_lag*ncontracts)];
-                        elseif correlation == 1
-                            init = [init; k, sc, 0, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.9, ncontracts), repelem(0.3, n_lag*ncontracts)];
-                        end
+                                if n_lag > 1
+                                    init = [init; k, sc, 0, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.7, ncontracts), repelem(0.1, ncontracts*(n_lag-1))];
+                                elseif n_lag == 1
+                                    init = [init; k, sc, 0, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.7, ncontracts)];
+                                elseif n_lag == 0
+                                    init = [init; k, sc, 0, m, sx, 0, rh, repelem(0.01, ncontracts)];
+                                end
+                            elseif correlation == 1
+                                if n_lag > 1
+                                    init = [init; k, sc, 0, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.9, ncontracts), repelem(0.7, ncontracts), repelem(0.1, ncontracts*(n_lag-1))];
+                                elseif n_lag == 1
+                                    init = [init; k, sc, 0, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.9, ncontracts), repelem(0.7, ncontracts)];
+                                elseif n_lag == 0
+                                    init = [init; k, sc, 0, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.9, ncontracts)];
+                                end
+                            end
                     end
                 end
             end
@@ -35,11 +47,11 @@ elseif LT == "OU"
                         for rh = grid(8,:)
                             if correlation == 0
                                 if n_lag > 1
-                                    init = [init; k, sc, 0, g, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.9, ncontracts), repelem(0.7, ncontracts), repelem(0.1, ncontracts*(n_lag-1))];
+                                    init = [init; k, sc, 0, g, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.7, ncontracts), repelem(0.1, ncontracts*(n_lag-1))];
                                 elseif n_lag == 1
-                                    init = [init; k, sc, 0, g, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.9, ncontracts), repelem(0.7, ncontracts)];
+                                    init = [init; k, sc, 0, g, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.7, ncontracts)];
                                 elseif n_lag == 0
-                                    init = [init; k, sc, 0, g, m, sx, 0, rh, repelem(0.01, ncontracts), repelem(0.9, ncontracts)];
+                                    init = [init; k, sc, 0, g, m, sx, 0, rh, repelem(0.01, ncontracts)];
                                 end
                             elseif correlation == 1
                                 if n_lag > 1

@@ -6,13 +6,10 @@
 
 % Mathematical expressions for the linear state-space model
 % x_t = C + G * x_{t-1}+ + w_t, w_t ~ N(0, W)
-% y_t = d_t + B_t * x_{t-1} + v_t + M * v_{t-1}, v_t ~ N(0, V)
+% y_t = d_t + B_t * x_{t-1} + M * v_{t-1} + e_t, v_t ~ N(0, V) and
+% e_t ~ N(0,V_e)
 
-% For simplicity, we assume 360 days in a year, 30 days in a month.
-% For model 1, we assume V is a diagonal matrix. i.e. No intercorrelation between
-% contracts with different maturities.
-% For model 2, we assume V is not a full covariance matrix. i.e.
-% Intercorrelations exist between measurement errors of different contracts.
+% For simplicity, we assume 260 days in a year, 30 days in a month.
 
 function [simY, x, ttm, v] = simulateY(par, par_names, T, ncontracts, nobsn, deltat, LT, correlation, serial)
 % par is a vector of relevant parameters of the model.
@@ -32,7 +29,7 @@ end
 
 % Time to maturity
 ttm = zeros(nobsn, ncontracts);
-yeardays = 360;
+yeardays = 260;
 monthdays = 30;
 
 for j = 1:ncontracts
@@ -40,12 +37,17 @@ for j = 1:ncontracts
         if j == 1
             ttm(i,j) = T(j) - i/yeardays;
             if ttm(i,j) < 0
-                ttm(i,j) = ttm((i - monthdays * 12 * T(j)), j);
+%                 ttm(i,j) = ttm((i - monthdays * 12 * T(j)), j);
+%                 ttm(i,j) = ttm(i-yeardays/2,j);
+                ttm(i,j) = ttm(i-yeardays,j);
             end
         else
             ttm(i,j) = T(j) - i/yeardays;
-            if i > monthdays
-                ttm(i,j) = ttm(i - monthdays, j);
+%             if i > monthdays
+%             if i > yeardays/2
+                if i > yeardays
+%                 ttm(i,j) = ttm(i - yeardays/2, j);
+                ttm(i,j) = ttm(i - yeardays, j);
             end
         end
     end
@@ -82,8 +84,8 @@ elseif LT == "OU"
         (1 - exp(-(par.kappa + par.gamma) * deltat)) / (par.kappa + par.gamma) * (par.sigmachi * par.sigmaxi * par.rho_chixi), (1 - exp(-2 * par.gamma * deltat)) / (2 * par.gamma) * par.sigmaxi^2];
 
     x = zeros(nobsn, size(C,1));
-    x(1,:) = [0 ; par.mu / par.gamma]'; % Initial value of x.
-
+%     x(1,:) = [0 ; par.mu / par.gamma]'; % Initial value of x.
+    x(1,:) = [0; par.mu]';
 
     d1 = (1 - exp(-2 * par.kappa * ttm)) * par.sigmachi^2 / (2 * par.kappa);
     d2 = (1 - exp(-2 * par.gamma * ttm)) * par.sigmaxi^2 / (2 * par.gamma);
@@ -156,13 +158,13 @@ vnormsigma = V;
 y = zeros(nobsn, ncontracts);
 
 % Simulate AR Errors
-% error_mdl = arima('AR', par.phi, 'ARLags', n_lags, 'Constant', 0, 'Variance', V);
 if n_lags > 0
     AR = {};
     for i = 1:n_lags
         AR{i} = [diag(par.phi(((i-1)*ncontracts+1):ncontracts*i))];
     end
-    V_temp = round(V, 19, 'decimals');
+    V_temp = triu(V);
+    V_temp = V_temp + V_temp' - diag(diag(V_temp));
     error_mdl = varm('Constant', vnormmu, 'AR', AR, 'Covariance', V_temp);
     v = simulate(error_mdl, nobsn);
 elseif n_lags == 0
@@ -171,16 +173,7 @@ end
 
 
 for i = 1:nobsn
-
     y(i,:) = d(:,i) + B(:,:,i) * x(i,:)' + v(i,:)';
-
-    %     if i == 1
-    %         y(i,:) = d(:,i) + B(:,:,i) * x(i,:)' + v(i,:)';
-    %     else
-    %         v(i,:) = M * v(i-1,:)' + v(i,:)';
-    %         y(i,:) = d(:,i) + B(:,:,i) * x(i,:)' + v(i,:)'; %% Fix this part.
-    %     end
-
 end
 
 simY = y;

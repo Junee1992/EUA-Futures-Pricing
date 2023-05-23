@@ -1,6 +1,7 @@
 %% Parameter Estimation
-function [par_optim, log_L_optim, par_init, trend, season, att, ytt, ett] = param_estim(y, ttm, deltat, detrend_price, n_par, ncontracts, par_names, LT, correlation, max_lags)
+function [par_optim, log_L_optim, par_init, trend, season, att, ytt, ett, fitresult_linear, fitresult_season] = param_estim(y, ttm, deltat, detrend_price, n_par,par_names, LT, correlation, max_lags)
 
+[nobsn, ncontracts] = size(y);
 % Initial estimation - assume no AR process
 n_lag = 0;
 serial = "no";
@@ -10,14 +11,14 @@ serial = "no";
 
 if detrend_price == "yes"
     % Detrend the price
-    [y_detrend, trend] = linear_detrend(y);
-    seasonality = "sinusoid_b"
+    [y_detrend, trend, fitresult_linear] = linear_detrend(y);
+    seasonality = "sinusoid_b";
     for i = 1:10
-        [season, p, fitresult, gof] = deseasonalise(y_detrend, i, seasonality);
+        [season, p, fitresult_season, gof] = deseasonalise(y_detrend, i, seasonality);
         rmse_seasonality(i) = gof.rmse;
     end
     no_season = find(rmse_seasonality == min(rmse_seasonality));
-    [season, p, fitresult, gof] = deseasonalise(y_detrend, no_season, seasonality);
+    [season, p, fitresult_season, gof] = deseasonalise(y_detrend, no_season, seasonality);
     y_deseason = y_detrend - season;
 else
     trend = []; season = [];
@@ -25,7 +26,7 @@ else
 end
 
 % Grid search
-init = grid_search(lb, ub, 3, 6, n_par, n_lag, ncontracts, LT, correlation);
+init = grid_search(lb, ub, n_lag, ncontracts, LT, correlation);
 log_L = kf_v1(init(1,:), par_names, y_deseason, deltat, ttm, LT, correlation, serial);
 % parpool(8);
 parfor i = 1:size(init,1)

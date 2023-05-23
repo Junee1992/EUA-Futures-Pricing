@@ -1,15 +1,11 @@
 % Define Parameters
 
-function par_names = define_parameters(LT, ncontracts, correlation, n_lags, test)
+function par_names = define_parameters(LT, ncontracts, correlation, n_lags, RN)
 
-par_names= [];
+par_names = [];
 
 if LT == "GBM"
-    if test == "yes"
-        par_names = ["kappa", "sigmachi", "lambdachi", "mu", "sigmaxi", "rnmu", "rho_chixi"];
-    elseif test == "no"
         par_names = ["kappa", "sigmachi", "lambdachi", "mu", "sigmaxi", "lambdaxi", "rho_chixi"];
-    end
 elseif LT == "OU"
     par_names = ["kappa", "sigmachi", "lambdachi", "gamma", "mu", "sigmaxi", "lambdaxi", "rho_chixi"];
 else

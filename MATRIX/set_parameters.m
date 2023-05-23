@@ -1,17 +1,17 @@
 %% Sets parameters as a structure
 
-function param = set_parameters(LT, ncontracts, par_names, par_init, correlation, serial)
+function param = set_parameters(LT, ncontracts, par_names, par, correlation, serial)
 par_names = par_names';
 param = [];
 
 if LT  == "GBM"
     for i = 1:7
-        param.(genvarname(par_names(i))) = par_init(i);
+        param.(genvarname(par_names(i))) = par(i);
     end
 
     j = 1;
     for i = 8:7+ncontracts
-        param.s(j) = par_init(i);
+        param.s(j) = par(i);
         j = j+1;
     end
 
@@ -21,7 +21,7 @@ if LT  == "GBM"
     elseif correlation == 1
         j = 1;
         for i = 8+ncontracts : 7+2*ncontracts
-            param.rho(j) = par_init(i);
+            param.rho(j) = par(i);
             j = j+1;
         end
 
@@ -31,12 +31,12 @@ if LT  == "GBM"
 
 elseif LT == "OU"
     for i = 1:8
-        param.(genvarname(par_names(i))) = par_init(i);
+        param.(genvarname(par_names(i))) = par(i);
     end
 
     j = 1;
     for i = 9:8+ncontracts
-        param.s(j) = par_init(i);
+        param.s(j) = par(i);
         j = j+1;
     end
 
@@ -46,7 +46,7 @@ elseif LT == "OU"
     elseif correlation == 1
         j = 1;
         for i = 9+ncontracts : 8+2*ncontracts
-            param.rho(j) = par_init(i);
+            param.rho(j) = par(i);
             j = j+1;
         end
 
@@ -80,7 +80,7 @@ end
 if serial == "yes"
     j = 1;
     for i = min(find(startsWith(par_names, 'phi_'))):max(find(startsWith(par_names, 'phi_')))
-        param.phi(j) = par_init(i);
+        param.phi(j) = par(i);
         j = j+1;
     end
 elseif serial == "no"
