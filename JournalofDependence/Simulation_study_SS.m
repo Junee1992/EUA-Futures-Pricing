@@ -36,8 +36,8 @@ lambdaxi = 0.05;
 rho = 0.3;
 vsig = repelem(0.01, ncontracts); % Volatilities of measurement errors.
 correl = repelem(0.8, ncontracts); % intercorrelations between measurement errors.
-n_lags = 1; % AR order (p)
-m = repelem(0.4, n_lags * ncontracts); % AR coefficients.
+n_lags = 0; % AR order (p)
+% m = repelem(0.4, n_lags * ncontracts); % AR coefficients.
 
 par = [kappa, sigmachi, lambdachi, gamma, mu, sigmaxi, lambdaxi, rho, vsig];
 
@@ -67,7 +67,7 @@ rng(100);
 LT = "OU"; % GBM or OU.
 n_season = 0;
 correlation = 0; % 0 for diagonal matrix, 1 for full matrix.
-max_lags = 2; % number of lags to be considered for serial correlation of measurement errors
+max_lags = 0; % number of lags to be considered for serial correlation of measurement errors
 n_lag = 0; % Assume no AR in the first iteration.
 
 detrend_price = "no"; % "yes" for deseasonalisation, otherwise "no"

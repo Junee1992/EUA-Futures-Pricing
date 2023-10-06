@@ -4,7 +4,7 @@ function init = grid_search(lb, ub, n_lag, ncontracts, LT, correlation)
 mid = (lb + ub) / 2;
 mp1 = (mid + lb) / 2;
 mp2 = (mid + ub) / 2;
-grid = [mp1; mid; mp2]';
+grid = [lb; mp1; mid; mp2; ub]';
 
 % est = zeros(ngrid^npar_grid, n_par+1);
 init = [];

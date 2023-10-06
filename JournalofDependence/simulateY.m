@@ -26,6 +26,8 @@ n_par = size(par, 2);
 par = set_parameters(LT, ncontracts, par_names, par, correlation, serial);
 if serial == "yes"
     n_lags = length(par.phi)/ncontracts;
+elseif serial == "no"
+    n_lags = 0;
 end
 
 % Time to maturity

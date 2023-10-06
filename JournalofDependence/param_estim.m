@@ -25,9 +25,7 @@ else
 end
 
 % Grid search
-init = grid_search(lb, ub, 3, 6, n_par, n_lag, ncontracts, LT);
-log_L = kf_v1(init(1,:), par_names, y_deseason, deltat, ttm, LT, correlation, serial);
-% parpool(8);
+init = grid_search(lb, ub, n_lag, ncontracts, LT, correlation);
 parfor i = 1:size(init,1)
     log_L = kf_v1(init(i,:), par_names, y_deseason, deltat, ttm, LT, correlation, serial);
     logL(i) = log_L;
