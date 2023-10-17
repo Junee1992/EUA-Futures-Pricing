@@ -7,7 +7,7 @@
 % where phi_p are diagonal matrices of AR coefficients at order p.
 close all; clear all;
 
-%% Using provided simulated data, (Remove line 67 if not using provided simulated dataset)
+%% Using provided simulated data, 
 
 % load('data.mat'); % Choose any file that begins with "y".
 [nobsn, ncontracts] = size(y);
