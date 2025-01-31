@@ -41,6 +41,8 @@ for r = 1:n_forecast
     if serial == "yes"
         [par_optim_temp, log_L_optim, par_init, trend, season, att, ytt, ett, vtt, fitresult_linear, fitresult_season, att_1, Ptt, Ptt_1] = ...
             param_estim_arp(y_temp(1:n_temp+r-1, :), ttm(1:n_temp+r-1, :), deltat, detrend_price, n_par_temp, par_names_temp, LT, correlation, par_optim);
+    elseif serial == "no"
+        vtt = [];
     end
     optim_param{r}= par_optim_temp;
 
@@ -54,14 +56,14 @@ for r = 1:n_forecast
     C_test = [0; par.mu * (1 - exp(-par.gamma * deltat)) / par.gamma];
     G_test = [exp(-par.kappa * deltat) , 0; 0, exp(-par.gamma * deltat)];
     a0 = att(end,:)';
-    a0_save(:,r) = a0
+    a0_save(:,r) = a0;
     x_test(r,:) = C_test + G_test * a0;
     Ptt_save(:,:,r) = Ptt(:,:,end);
-
     W = [(1 - exp(-2 * par.kappa * deltat)) / (2 * par.kappa) * par.sigmachi^2, (1 - exp(-(par.kappa + par.gamma) * deltat)) / (par.kappa + par.gamma) * (par.sigmachi * par.sigmaxi * par.rho_chixi);
         (1 - exp(-(par.kappa + par.gamma) * deltat)) / (par.kappa + par.gamma) * (par.sigmachi * par.sigmaxi * par.rho_chixi), (1 - exp(-2 * par.gamma * deltat)) / (2 * par.gamma) * par.sigmaxi^2];
     ttm_test = ttm(n_temp-n_lag+r:n_temp+r, :);
-
+    Ptt_1 = G_test*Ptt(:,:,end)*G_test'+W;
+    
     % Measurement Equation
     d1_test = (1 - exp(-2 * par.kappa * ttm_test)) * par.sigmachi^2 / (2 * par.kappa);
     d2_test = (1 - exp(-2 * par.gamma * ttm_test)) * par.sigmaxi^2 / (2 * par.gamma);
@@ -136,7 +138,7 @@ for r = 1:n_forecast
 
         y_fore(r,:) = d_test(:,end) + B_comb * x_test_temp + fitresult_linear(n_temp+r) + fitresult_season(n_temp+r);
         y_temp = [y_temp; y_fore(r,:)];
-        varn(:,:,r) = B_comb * Ptt_1 * B_comb'
+        varn(:,:,r) = B_comb * Ptt_1 * B_comb';
     end
 end
 

@@ -10,7 +10,7 @@ rng(1000);
 % Model Options (Simulation)
 LT = "OU"; correlation = 1; % = 1 if inter-correlated measurement errors, = 0 if diagonal.
 deltat = 1/260; % Assume 260 days in a year.
-ncontracts = 5; nobsn = 1000; % Number of contracts, number of observations, n x K
+ncontracts = 5; nobsn = 100; % Number of contracts, number of observations, n x K
 kappa = 0.5; sigmachi = 0.3; lambdachi = 0.02;
 gamma = 0.1; mu = 0.5; sigmaxi = 0.2; lambdaxi = 0.02;
 rho_chixi = 0.8;
@@ -69,3 +69,16 @@ par_names = define_parameters(LT, ncontracts, correlation, n_lag)';
 model_options = struct('LT', LT, 'correlation', correlation, 'par_names', par_names, 'deltat', deltat, ...
     'detrend_price', detrend_price, 'max_lags', max_lags, 'n_forecast', n_forecast, 'n_temp', n_temp);
 output = forecast_KF(y_temp, ttm, model_options);
+
+% Plot
+figure;
+y_temp = output.y_temp; varn = output.varn;
+plot(y(:,1), 'k');
+hold on
+plot(nobsn-n_forecast:nobsn, y_temp(nobsn-n_forecast:nobsn,1), 'r');
+for i = 1:n_forecast
+    lb_y(i,:) = y_temp(nobsn-n_forecast+i,:)' - 1.96 * sqrt(diag(varn(:,:,i)));
+    ub_y(i,:) = y_temp(nobsn-n_forecast+i,:)' + 1.96 * sqrt(diag(varn(:,:,i)));
+end
+plot(nobsn-n_forecast:nobsn, [y_temp(nobsn-n_forecast,1); lb_y(:,1)], 'r--');
+plot(nobsn-n_forecast:nobsn, [y_temp(nobsn-n_forecast,1); ub_y(:,1)], 'r--');
